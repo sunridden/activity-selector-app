@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Selector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f7fafc 0%, #4a5568 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #2a2a2a, #4a4a4a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #3c4043;
+            box-shadow: 0 0 0 3px rgba(60, 64, 67, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #3c4043, #1a1a1a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(60, 64, 67, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(60, 64, 67, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .activity-list {
+            margin: 20px 0;
+        }
+        
+        .activity-item {
+            background: rgba(60, 64, 67, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .remove-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .tournament-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e1e5e9;
+        }
+        
+        .battle {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #3c4043;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .winner {
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        
+        .final-winner {
+            background: linear-gradient(45deg, #3c4043, #1a1a1a);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: celebrate 0.6s ease;
+            box-shadow: 0 10px 30px rgba(60, 64, 67, 0.3);
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .controls button {
+            margin: 0 10px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 Activity Selector</h1>
+        
+        <div class="input-section">
+            <div class="info">Add activities to randomly compete in a tournament-style selection</div>
+            <div class="input-group">
+                <input type="text" id="activityInput" placeholder="Enter an activity..." maxlength="100">
+                <button onclick="addActivity()">Add</button>
+            </div>
+            <div id="errorMessage" class="error"></div>
+            
+            <div class="activity-list" id="activityList"></div>
+            
+            <div class="controls">
+                <button onclick="startTournament()" id="startBtn" disabled>Start Tournament</button>
+                <button onclick="clearAll()">Clear All</button>
+            </div>
+        </div>
+        
+        <div class="tournament-section" id="tournamentSection" style="display: none;">
+            <h2>Tournament Results</h2>
+            <div id="battleLog"></div>
+            <div id="finalResult"></div>
+            <div class="controls">
+                <button onclick="resetTournament()">New Tournament</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activityList = [];
+        
+        // Add activity to the list
+        function addActivity() {
+            const input = document.getElementById('activityInput');
+            const activity = input.value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Clear previous error
+            errorDiv.textContent = '';
+            
+            // Validate input
+            if (activity === '') {
+                errorDiv.textContent = 'Please enter an activity name.';
+                return;
+            }
+            
+            if (activityList.includes(activity)) {
+                errorDiv.textContent = 'This activity is already in the list.';
+                return;
+            }
+            
+            // Add activity
+            activityList.push(activity);
+            input.value = '';
+            updateActivityDisplay();
+            updateStartButton();
+        }
+        
+        // Remove activity from list
+        function removeActivity(index) {
+            activityList.splice(index, 1);
+            updateActivityDisplay();
+            updateStartButton();
+        }
+        
+        // Update the display of activities
+        function updateActivityDisplay() {
+            const listDiv = document.getElementById('activityList');
+            listDiv.innerHTML = '';
+            
+            activityList.forEach((activity, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'activity-item';
+                itemDiv.innerHTML = `
+                    <span>${activity}</span>
+                    <button class="remove-btn" onclick="removeActivity(${index})">Remove</button>
+                `;
+                listDiv.appendChild(itemDiv);
+            });
+        }
+        
+        // Update start button state
+        function updateStartButton() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = activityList.length < 2;
+        }
+        
+        // Clear all activities
+        function clearAll() {
+            activityList = [];
+            updateActivityDisplay();
+            updateStartButton();
+            document.getElementById('errorMessage').textContent = '';
+        }
+        
+        // Start the tournament (same logic as original Python)
+        function startTournament() {
+            const tournamentActivities = [...activityList]; // Create a copy
+            const battleLog = document.getElementById('battleLog');
+            const finalResult = document.getElementById('finalResult');
+            
+            // Clear previous results
+            battleLog.innerHTML = '';
+            finalResult.innerHTML = '';
+            
+            // Show tournament section
+            document.getElementById('tournamentSection').style.display = 'block';
+            
+            // Run the tournament
+            findWinner(tournamentActivities, battleLog, finalResult);
+        }
+        
+        // Tournament logic (converted from Python)
+        function findWinner(tournamentActivities, battleLog, finalResult) {
+            let foundWinner = false;
+            let losers = [];
+            
+            while (!foundWinner) {
+                let startIndex = 0;
+                
+                if (tournamentActivities.length === 1 || tournamentActivities.length === 0) {
+                    foundWinner = true;
+                    continue;
+                }
+                
+                // Handle odd number of activities
+                if (tournamentActivities.length % 2 !== 0) {
+                    startIndex = 1;
+                }
+                
+                // Pair activities for battles
+                for (let activityIndex = startIndex; activityIndex < tournamentActivities.length; activityIndex += 2) {
+                    const first = tournamentActivities[activityIndex];
+                    const second = tournamentActivities[activityIndex + 1];
+                    const roundWinner = Math.floor(Math.random() * 2); // 0 or 1
+                    
+                    let battleResult;
+                    let loserIndex;
+                    
+                    if (roundWinner === 0) {
+                        loserIndex = activityIndex + 1;
+                        battleResult = `<span class="winner">${first}</span> vs ${second}`;
+                    } else {
+                        loserIndex = activityIndex;
+                        battleResult = `${first} vs <span class="winner">${second}</span>`;
+                    }
+                    
+                    // Add battle to log
+                    const battleDiv = document.createElement('div');
+                    battleDiv.className = 'battle';
+                    battleDiv.innerHTML = battleResult;
+                    battleLog.appendChild(battleDiv);
+                    
+                    losers.push(tournamentActivities[loserIndex]);
+                }
+                
+                // Remove losers from the list
+                for (const loser of losers) {
+                    const index = tournamentActivities.indexOf(loser);
+                    if (index > -1) {
+                        tournamentActivities.splice(index, 1);
+                    }
+                }
+                losers = [];
+                
+                // Add a small delay to make battles appear gradually
+                if (tournamentActivities.length > 1) {
+                    setTimeout(() => {
+                        // Continue tournament in next iteration
+                    }, 500);
+                }
+            }
+            
+            // Display final winner
+            if (tournamentActivities.length === 1) {
+                const winner = tournamentActivities[0];
+                finalResult.innerHTML = `<div class="final-winner">🎉 Your chosen activity is: ${winner} 🎉</div>`;
+            } else {
+                finalResult.innerHTML = '<div class="error">No activities to select from!</div>';
+            }
+        }
+        
+        // Reset for new tournament
+        function resetTournament() {
+            document.getElementById('tournamentSection').style.display = 'none';
+            document.getElementById('battleLog').innerHTML = '';
+            document.getElementById('finalResult').innerHTML = '';
+        }
+        
+        // Allow Enter key to add activity
+        document.getElementById('activityInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addActivity();
+            }
+        });
+        
+        // Focus input when 'S' key is pressed
+        document.addEventListener('keydown', function(e) {
+            // Only focus if we're not already typing in an input field
+            if (e.key.toLowerCase() === 's' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault(); // Prevent the 's' from being typed
+                document.getElementById('activityInput').focus();
+            }
+        });
+        
+        // Initialize
+        updateStartButton();
+    </script>
+</body>
+</html>
